@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U'ocr - Transcribe Handwriting with AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            color: #2d3436;
+            background: #f7f9fc;
+            line-height: 1.8;
+        }
+
+        /* Utility Classes */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #007bff;
+            color: #007bff;
+        }
+
+        .btn-secondary:hover {
+            background: #007bff;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Header */
+        header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 45px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo img:hover {
+            transform: scale(1.05);
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+        }
+
+        nav a {
+            margin: 0 20px;
+            text-decoration: none;
+            color: #2d3436;
+            font-size: 16px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #007bff;
+        }
+
+        .nav-buttons .btn {
+            margin-left: 10px;
+        }
+
+        .nav-buttons .new {
+            background: #28a745;
+            color: white;
+        }
+
+        .nav-buttons .new:hover {
+            background: #218838;
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            background: #2d3436;
+            height: 3px;
+            width: 100%;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://s3.eu-central-1.amazonaws.com/readcoop.cis.public-assets.prod/products/cursive-snippet.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            opacity: 0;
+            animation: fadeIn 1.5s ease forwards;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            line-height: 1.2;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .features h2 {
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 50px;
+            color: #2d3436;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
+            background: #f7f9fc;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2d3436;
+        }
+
+        .feature-card p {
+            color: #636e72;
+            font-size: 16px;
+        }
+
+        /* Stats Section */
+        .stats {
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            color: white;
+            padding: 50px 0;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .stat h2 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat p {
+            font-size: 16px;
+            font-weight: 300;
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            padding: 80px 0;
+            background: #f7f9fc;
+        }
+
+        .how-it-works h2 {
+            font-size: 36px;
+            margin-bottom: 40px;
+            color: #2d3436;
+        }
+
+        .how-it-works-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .how-it-works-text {
+            width: 50%;
+        }
+
+        .how-it-works-text p {
+            color: #636e72;
+            font-size: 16px;
+        }
+
+        .how-it-works-image {
+            width: 45%;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .how-it-works-image img {
+            width: 100%;
+            border-radius: 5px;
+        }
+
+        /* About Handwriting Section */
+        .about-handwriting {
+            padding: 80px 0;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .about-handwriting-image {
+            width: 55%;
+            background: #f7f9fc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .about-handwriting-image img {
+            width: 100%;
+            border-radius: 5px;
+        }
+
+        .about-handwriting-text {
+            width: 40%;
+        }
+
+        .about-handwriting-text h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #2d3436;
+        }
+
+        .about-handwriting-text p {
+            color: #636e72;
+            font-size: 16px;
+        }
+
+        /* Footer */
+        footer {
+            background: #2d3436;
+            color: #dfe6e9;
+            padding: 50px 0;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-column {
+            width: 20%;
+            min-width: 200px;
+        }
+
+        .footer-column h4 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .footer-column a {
+            display: block;
+            color: #dfe6e9;
+            text-decoration: none;
+            margin-bottom: 10px;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-column a:hover {
+            color: #007bff;
+        }
+
+        .footer-column .btn {
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Chat Button */
+        .chat-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #007bff;
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .chat-button:hover {
+            transform: scale(1.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                position: relative;
+            }
+
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: white;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                padding: 20px 0;
+                z-index: 99;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                margin: 10px 0;
+                text-align: center;
+                font-size: 18px;
+            }
+
+            .nav-buttons {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .how-it-works-content,
+            .about-handwriting {
+                flex-direction: column;
+            }
+
+            .how-it-works-text,
+            .how-it-works-image,
+            .about-handwriting-image,
+            .about-handwriting-text {
+                width: 100%;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .footer-column {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <img src="https://cdn.pixabay.com/photo/2016/03/31/18/36/book-1296045_1280.png" alt="U'ocr Logo">
+            </div>
+            <nav>
+                <div class="nav-links" id="navLinks">
+                    <a href="#">Platform & Features</a>
+                    <a href="#">Solutions</a>
+                    <a href="#">Resources</a>
+                    <a href="#">The co-op</a>
+                    <a href="#">Plans & pricing</a>
+                    <div class="nav-buttons">
+                        <button class="btn new">New</button>
+                        <button class="btn btn-secondary" onclick="window.location.href='https://www.uocr.com/app'">Open app</button>
+                        <button class="btn btn-primary" onclick="window.location.href='https://www.uocr.com/try-free'">Try free</button>
+                    </div>
+                </div>
+            </nav>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content container">
+            <h1>Start transcribing handwriting with U'ocr</h1>
+            <button class="btn btn-primary" onclick="window.location.href='https://www.uocr.com/try-free'">Try for free</button>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2>How U'ocr helps you to translate handwriting to text</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Decipher handwriting with AI-powered Text Recognition</h3>
+                    <p>Automatically recognize any handwriting documents and turn them into normal text. U'ocr helps you to convert various handwriting styles from different centuries.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Manually transcribe and correct automatic transcriptions</h3>
+                    <p>With the transcription editor, you can manually transcribe any handwriting or you can correct transcription errors from the automatic transcription. The results can vary depending on the handwriting and the quality of the material.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Train your own AI text recognition models</h3>
+                    <p>You can also train specific text recognition models that are capable of recognizing the handwriting of your material.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Search your handwritten documents</h3>
+                    <p>With U'ocr, you can search your documents for names, keywords, and more with advanced search options.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stat">
+                <h2>100 000+</h2>
+                <p>Registered Users</p>
+            </div>
+            <div class="stat">
+                <h2>15 000+</h2>
+                <p>HTR AI Models trained</p>
+            </div>
+            <div class="stat">
+                <h2>40+ Million</h2>
+                <p>Pages processed</p>
+            </div>
+            <div class="stat">
+                <h2>100+</h2>
+                <p>Free Public AI Models</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works">
+        <div class="container">
+            <h2>How U'ocr works</h2>
+            <div class="how-it-works-content">
+                <div class="how-it-works-text">
+                    <p>U'ocr is a software that uses artificial intelligence to "learn" how to read any handwriting. For this, the software first needed to be trained with a number of pages that have been manually transcribed. This so called "Ground Truth" enables U'ocr to understand and read any form of handwriting. The model "Universal Giant" for instance was trained with more than 15 Million words from many different handwritings. You can use this and other pretrained AI models to automatically recognize your handwritten documents and convert them into normal text. If you are able and willing to transcribe about 50 pages by yourself, you can also train a custom AI model. Your own model is then able to recognize exactly the handwriting that you are working with.</p>
+                </div>
+                <div class="how-it-works-image">
+                    <img src="https://s3.eu-central-1.amazonaws.com/readcoop.cis.public-assets.prod/products/cursive-snippet.jpg" alt="Handwriting Sample">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Handwriting Section -->
+    <section class="about-handwriting">
+        <div class="container">
+            <div class="about-handwriting-image">
+                <img src="https://s3.eu-central-1.amazonaws.com/readcoop.cis.public-assets.prod/products/cursive-snippet.jpg" alt="Handwriting Sample">
+            </div>
+            <div class="about-handwriting-text">
+                <h2>About Handwriting</h2>
+                <p>Handwriting has been a primary form of communication across cultures. Millions of documents, letters, and personal notes exist, penned in various handwriting styles. With U'ocr, these documents can be digitized and made accessible for public or private use.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-column">
+                <h4>Company</h4>
+                <a href="#">About Us</a>
+                <a href="#">Work With Us</a>
+            </div>
+            <div class="footer-column">
+                <h4>Help & Support</h4>
+                <a href="#">Help Center</a>
+                <a href="#">Contact Us</a>
+            </div>
+            <div class="footer-column">
+                <h4>U'ocr is used for</h4>
+                <a href="https://www.abbyy.com/en-us/blog/handwriting-recognition-ocr/">Cursive Handwriting</a>
+                <a href="https://www.scan2cad.com/blog/ocr/character-recognition/">Current Script</a>
+                <a href="https://towardsdatascience.com/a-gentle-introduction-to-ocr-ee1469a201aa">Handwriting to Text</a>
+                <a href="https://www.nanowerk.com/spotlight/spotid=61472.php">Image to Text</a>
+                <a href="https://www.techradar.com/best/ocr-software">Handwriting OCR</a>
+            </div>
+            <div class="footer-column">
+                <button class="btn btn-primary" onclick="window.location.href='https://www.uocr.com/try-free'">Create a free account</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chat Button -->
+    <div class="chat-button">
+        <span>💬</span>
+    </div>
+
+    <script>
+        // Hamburger Menu Toggle
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        // Close menu when a link is clicked (for mobile)
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // Chat button functionality
+        document.querySelector('.chat-button').addEventListener('click', () => {
+            alert('Chat support coming soon!');
+        });
+
+        // Smooth scroll for nav links (if needed)
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
