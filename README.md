@@ -1,3 +1,4 @@
+![image](https://github.com/user-attachments/assets/30983dcc-7b76-4d8f-a36d-4a8772ec3599)
 # 📜 U'ocr - Transcribe Handwriting with AI 🚀
 
 ![U'ocr Logo](https://cdn.pixabay.com/photo/2016/03/31/18/36/book-1296045_1280.png)
